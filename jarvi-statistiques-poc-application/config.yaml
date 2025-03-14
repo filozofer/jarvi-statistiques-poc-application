@@ -1,0 +1,7 @@
+version: 3
+endpoint: https://wtytcldhcwbdrznpgjiy.hasura.eu-central-1.nhost.run
+admin_secret: GXxkk'dboAWv#@MZ2X!9zwk0:siIvxWx
+metadata_directory: metadata
+actions:
+  kind: synchronous
+  handler_webhook_baseurl: http://localhost:3000

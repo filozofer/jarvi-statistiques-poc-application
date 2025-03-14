@@ -1,0 +1,80 @@
+table:
+  name: historyentries
+  schema: public
+configuration:
+  column_config:
+    created_at:
+      custom_name: createdAt
+    deleted_at:
+      custom_name: deletedAt
+    event_end_at:
+      custom_name: eventEndAt
+    event_start_at:
+      custom_name: eventStartAt
+    external_id:
+      custom_name: externalId
+    external_thread_id:
+      custom_name: externalThreadId
+    is_manually_created:
+      custom_name: isManuallyCreated
+    is_read:
+      custom_name: isRead
+    linkedin_seat_id:
+      custom_name: linkedinSeatId
+    message_scheduled_id:
+      custom_name: messageScheduledId
+    profile_id:
+      custom_name: profileId
+    sender_user_id:
+      custom_name: senderUserId
+    trigger_has_been_replied_to:
+      custom_name: triggerHasBeenRepliedTo
+    updated_at:
+      custom_name: updatedAt
+    user_id:
+      custom_name: userId
+  custom_column_names:
+    created_at: createdAt
+    deleted_at: deletedAt
+    event_end_at: eventEndAt
+    event_start_at: eventStartAt
+    external_id: externalId
+    external_thread_id: externalThreadId
+    is_manually_created: isManuallyCreated
+    is_read: isRead
+    linkedin_seat_id: linkedinSeatId
+    message_scheduled_id: messageScheduledId
+    profile_id: profileId
+    sender_user_id: senderUserId
+    trigger_has_been_replied_to: triggerHasBeenRepliedTo
+    updated_at: updatedAt
+    user_id: userId
+  custom_root_fields: {}
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - is_manually_created
+        - is_read
+        - trigger_has_been_replied_to
+        - linkedin_seat_id
+        - data
+        - metadata
+        - external_id
+        - external_thread_id
+        - message
+        - subject
+        - type
+        - created_at
+        - deleted_at
+        - event_end_at
+        - event_start_at
+        - updated_at
+        - id
+        - profile_id
+        - sender_user_id
+        - user_id
+        - message_scheduled_id
+      filter: {}
+      allow_aggregations: true
+    comment: ""
