@@ -178,7 +178,7 @@ const StatsCharts = ({ filters }: FiltersProps) => {
 
     // Retrieve statistics with Hasura GraphQL aggregations
     // ⚠️ More than 20 seconds for retrieving the numbers. Maybe it's time to using an ElasticSearch or indexes on database ?
-    // ⚠️ Better now with an INDEXE on user_id column 13 seconds
+    // ⚠️ Better now with INDEXES on user_id and created_at column but still ~13 seconds
     const { data, loading, error } = useAuthQuery(HISTORY_ENTRIES_STATISTIQUES_QUERY, { variables: historyEntriesStatistiquesQueryVariables });
     const { data: dataCompare, loading: loadingCompare, error: errorCompare } = useAuthQuery(HISTORY_ENTRIES_STATISTIQUES_QUERY, { variables: historyEntriesCompareStatistiquesQueryVariables, skip: filters.periodCompare === 'none' });
     // Pre-render loading or error state
@@ -237,10 +237,6 @@ const StatsCharts = ({ filters }: FiltersProps) => {
             'Échecs période comparaison': dataCompare.linkedin_inmail_solicitation_failed.aggregate.count,
         }
     ] : [];
-
-    // TODO [1] optimization API response time
-    // TODO [2] tests?
-    // TODO [<1] Send my result to Quentin
 
     // Render charts
     return (
