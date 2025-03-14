@@ -1,3 +1,4 @@
 # https://www.robotstxt.org/robotstxt.html
+# We disallow any robots to crawl our website which is just the result of an exercice
 User-agent: *
-Disallow:
+Disallow: /
