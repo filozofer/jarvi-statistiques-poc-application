@@ -4,7 +4,7 @@ import { useSignInEmailPassword } from '@nhost/react';
 import { useAuthQuery } from '@nhost/react-apollo';
 import { AppBar, Toolbar, Container, Box, Card, CardContent, Typography, Stack, MenuItem, Select, FormGroup, FormControlLabel, Switch, InputLabel } from '@mui/material';
 import { useFormik } from 'formik';
-import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Legend, ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar, Line } from 'recharts';
 import moment from 'moment';
 
 const HISTORY_ENTRIES_STATISTIQUES_QUERY = gql`
@@ -82,7 +82,7 @@ const Filters = ({ filters, setFilters }: FiltersProps) => {
                     </Select>
                 </Box>
 
-                {/* Period selection */}
+                {/* Periode selection */}
                 <Box sx={{ marginRight: '10px' }}>
                     <InputLabel htmlFor="period">Période</InputLabel>
                     <Select name="period" value={formik.values.period} onChange={submitOnHandleChange} fullWidth margin="dense">
@@ -93,7 +93,7 @@ const Filters = ({ filters, setFilters }: FiltersProps) => {
                     </Select>
                 </Box>
 
-                {/* Period de comparaison */}
+                {/* Periode de comparaison */}
                 <Box sx={{ marginRight: '10px' }}>
                     <InputLabel htmlFor="periodCompare">Période de comparaison</InputLabel>
                     <Select name="periodCompare" value={formik.values.periodCompare} onChange={submitOnHandleChange} fullWidth margin="dense">
@@ -122,7 +122,7 @@ const filtersToQueryVariables = (filters: FiltersState, periodProperty: 'period'
         createdAtLt: ''
     };
 
-    // Adapt period
+    // Adapt base on selected period
     switch (filters[periodProperty]) {
         case 'current_week':
             variables = {
@@ -154,7 +154,9 @@ const filtersToQueryVariables = (filters: FiltersState, periodProperty: 'period'
             break;
     }
 
+    // Return built request variables
     return variables;
+
 }
 
 /**
@@ -176,6 +178,7 @@ const StatsCharts = ({ filters }: FiltersProps) => {
 
     // Retrieve statistics with Hasura GraphQL aggregations
     // ⚠️ More than 20 seconds for retrieving the numbers. Maybe it's time to using an ElasticSearch or indexes on database ?
+    // ⚠️ Better now with an INDEXE on user_id column 13 seconds
     const { data, loading, error } = useAuthQuery(HISTORY_ENTRIES_STATISTIQUES_QUERY, { variables: historyEntriesStatistiquesQueryVariables });
     const { data: dataCompare, loading: loadingCompare, error: errorCompare } = useAuthQuery(HISTORY_ENTRIES_STATISTIQUES_QUERY, { variables: historyEntriesCompareStatistiquesQueryVariables, skip: filters.periodCompare === 'none' });
     // Pre-render loading or error state
@@ -204,25 +207,53 @@ const StatsCharts = ({ filters }: FiltersProps) => {
         { name: 'LinkedIn inmail réussis', color: '#E6AE2F', value: +(chartDataDetails[4].value * 100 / (chartDataDetails[4].value + chartDataDetails[5].value)).toFixed(0) },
         { name: 'LinkedIn inmail échoués', color: '#EDC568', value: +(chartDataDetails[5].value * 100 / (chartDataDetails[4].value + chartDataDetails[5].value)).toFixed(0) },
     ];
+    // BarChart data
+    const barChartData = dataCompare ? [
+        {
+            name: 'Emails',
+            colorSuccess: '#040A33',
+            colorFailed: '#6275F4',
+            'Succès période': data.email_solicitation_success.aggregate.count,
+            'Échecs période': data.email_solicitation_failed.aggregate.count,
+            'Succès période comparaison': dataCompare.email_solicitation_success.aggregate.count,
+            'Échecs période comparaison': dataCompare.email_solicitation_failed.aggregate.count,
+        },
+        {
+            name: 'LinkedIn Messages',
+            colorSuccess: '#0A66C2',
+            colorFailed: '#86BFF9',
+            'Succès période': data.linkedin_message_solicitation_success.aggregate.count,
+            'Échecs période': data.linkedin_message_solicitation_failed.aggregate.count,
+            'Succès période comparaison': dataCompare.linkedin_message_solicitation_success.aggregate.count,
+            'Échecs période comparaison': dataCompare.linkedin_message_solicitation_failed.aggregate.count,
+        },
+        {
+            name: 'LinkedIn InMails',
+            colorSuccess: '#E6AE2F',
+            colorFailed: '#EDC568',
+            'Succès période': data.linkedin_inmail_solicitation_success.aggregate.count,
+            'Échecs période': data.linkedin_inmail_solicitation_failed.aggregate.count,
+            'Succès période comparaison': dataCompare.linkedin_inmail_solicitation_success.aggregate.count,
+            'Échecs période comparaison': dataCompare.linkedin_inmail_solicitation_failed.aggregate.count,
+        }
+    ] : [];
 
-    // TODO [1] Charts for period comparaison
     // TODO [1] optimization API response time
     // TODO [2] tests?
-    // TODO [<1] comment everywhere
-    // TODO [<1] Commit + Push on github
-    // TODO [<1] Upload on netifly
     // TODO [<1] Send my result to Quentin
-    console.log('Data', data);
-    console.log('DataCompare', dataCompare);
 
     // Render charts
     return (
-        <>
+        <Box
+            display={'flex'}
+        >
+            {/* Pie Chart */}
             <Box
                 marginBottom={"40px"}
                 display={"flex"}
                 flexDirection={"column"}
                 alignItems={"center"}
+                flex={1}
             >
                 <strong style={{ paddingLeft: "10%", fontSize: "20px" }}>Taux de réponse aux sollications des candidats</strong>
                 <ResponsiveContainer width="100%" height={600}>
@@ -263,7 +294,58 @@ const StatsCharts = ({ filters }: FiltersProps) => {
                     />
                 </FormGroup>
             </Box>
-        </>
+
+            {/* Bar Chart */}
+            {dataCompare && (
+                <Box
+                    marginBottom={"40px"}
+                    display={"flex"}
+                    flexDirection={"column"}
+                    alignItems={"center"}
+                    flex={1}
+                >
+                    <strong style={{ paddingLeft: "10%", fontSize: "20px" }}>Comparaison entre périodes</strong>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                            width={400}
+                            height={250}
+                            data={barChartData}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 20,
+                                bottom: 5,
+                            }}
+                        >
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey={'Succès période comparaison'} label={'TEst'} stackId={'B'} fill={'#040A33'}>
+                                {barChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.colorSuccess} />
+                                ))}
+                            </Bar>
+                            <Bar dataKey={'Échecs période comparaison'} stackId={'B'} fill={'#6275F4'}>
+                                {barChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.colorFailed} />
+                                ))}
+                            </Bar>
+                            <Bar dataKey={'Succès période'} stackId={'A'} fill={'#040A33'}>
+                                {barChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.colorSuccess} />
+                                ))}
+                            </Bar>
+                            <Bar dataKey={'Échecs période'} stackId={'A'} fill={'#6275F4'}>
+                                {barChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.colorFailed} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </Box>
+            )}
+
+        </Box>
     );
 };
 

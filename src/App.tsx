@@ -1,4 +1,4 @@
-import Home from '@/components/routes/app/home'
+import Home from '@/components/routes/app/Home'
 import {Route, Routes} from 'react-router-dom'
 
 /**
