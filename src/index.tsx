@@ -11,7 +11,7 @@ import './index.css'
 
 // Init root + nhost client
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
-const nhost = new NhostClient({ subdomain: 'wtytcldhcwbdrznpgjiy', region: 'eu-central-1' })
+const nhost = new NhostClient({ subdomain: 'wtytcldhcwbdrznpgjiy', region: 'eu-central-1', devTools: true })
 
 // Render root app with proper providers (nhost + tooltip + theme + router)
 root.render(
