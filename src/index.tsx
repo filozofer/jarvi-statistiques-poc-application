@@ -14,6 +14,13 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 const nhost = new NhostClient({ subdomain: 'wtytcldhcwbdrznpgjiy', region: 'eu-central-1', devTools: true })
 console.log("Nhost instance:", nhost);
 console.log("Session before event:", nhost.auth.getSession());
+try {
+  localStorage.setItem("test", "value");
+  console.log("localStorage write test: success", localStorage.getItem("test"));
+  localStorage.removeItem("test");
+} catch (e) {
+  console.error("localStorage write test: failed", e);
+}
 nhost.auth.onAuthStateChanged((event, session) => {
   console.log("Auth event:", event);
   console.log("Session:", session);

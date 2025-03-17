@@ -1,6 +1,6 @@
 import { useEffect, useState} from 'react';
 import { gql } from '@apollo/client';
-import { useSignInEmailPassword } from '@nhost/react';
+import {useNhostClient, useSignInEmailPassword} from '@nhost/react';
 import { useAuthQuery } from '@nhost/react-apollo';
 import { AppBar, Toolbar, Container, Box, Card, CardContent, Typography, Stack, MenuItem, Select, FormGroup, FormControlLabel, Switch, InputLabel } from '@mui/material';
 import { useFormik } from 'formik';
@@ -353,6 +353,7 @@ export default function Home() {
 
     // Basic user authentication for this POC
     const { signInEmailPassword } = useSignInEmailPassword()
+    const nhost = useNhostClient();
     useEffect(() => {
         signInEmailPassword('quentin@jarvi.tech', 'mYAW9QVdMKZenfbA')
     }, []);
@@ -382,6 +383,11 @@ export default function Home() {
 
             {/* Main page Container */}
             <Stack spacing={2}>
+
+                <button onClick={async () => {
+                    const res = await nhost.auth.signIn({ email: 'quentin@jarvi.tech', password:  'mYAW9QVdMKZenfbA' });
+                    console.log("Sign-in result:", res);
+                }}>Test Login</button>
 
                 {/* Filters form */}
                 <Card>
