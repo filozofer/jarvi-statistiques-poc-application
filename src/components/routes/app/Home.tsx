@@ -180,7 +180,6 @@ const StatsCharts = ({ filters }: FiltersProps) => {
     // ⚠️ More than 20 seconds for retrieving the numbers. Maybe it's time to using an ElasticSearch or indexes on database ?
     // ⚠️ Better now with INDEXES on user_id and created_at column but still ~13 seconds
     const { data, loading, error, networkStatus, client } = useAuthQuery(HISTORY_ENTRIES_STATISTIQUES_QUERY, { variables: historyEntriesStatistiquesQueryVariables });
-    console.log('Debugging', networkStatus, client);
     const { data: dataCompare, loading: loadingCompare, error: errorCompare } = useAuthQuery(HISTORY_ENTRIES_STATISTIQUES_QUERY, { variables: historyEntriesCompareStatistiquesQueryVariables, skip: filters.periodCompare === 'none' });
     // Pre-render loading or error state
     if (loading || loadingCompare|| !data) return <p>Chargement en cours de vos statistiques...</p>;
@@ -383,11 +382,6 @@ export default function Home() {
 
             {/* Main page Container */}
             <Stack spacing={2}>
-
-                <button onClick={async () => {
-                    const res = await nhost.auth.signIn({ email: 'quentin@jarvi.tech', password:  'mYAW9QVdMKZenfbA' });
-                    console.log("Sign-in result:", res);
-                }}>Test Login</button>
 
                 {/* Filters form */}
                 <Card>
